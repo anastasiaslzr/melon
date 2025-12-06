@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="centered-container">
+    <h3>Notifications 🔔</h3>
+    <div class="list-group mt-3">
+        {% for alert in alerts %}
+            <div class="list-group-item">
+                <div class="d-flex align-items-center">
+                    <strong class="me-2">
+                        <a href="{% url 'profile' alert.sender.username %}" class="text-decoration-none text-dark">
+                            @{{ alert.sender.username }}
+                        </a>
+                    </strong>
+                    
+                    {% if alert.notification_type == 'follow' %}
+                        started following you.
+                    {% elif alert.notification_type == 'like' %}
+                        liked your <a href="{% url 'post' alert.post.id %} "> post</a>.
+                    {% endif %}
+                    
+                    <small class="text-muted ms-auto">{{ alert.created_at|timesince }} ago</small>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted text-center mt-4">No notifications yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

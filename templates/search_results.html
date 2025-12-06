@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="centered-container">
+    <h3>Search Results for "{{ query }}"</h3>
+
+    <h4>Users</h4>
+    {% for user in users %}
+        <div class="card mb-2 p-2">
+            <a href="{% url 'profile' user.username %}" class="text-decoration-none text-dark">
+                <strong>@{{ user.username }}</strong> - {{ user.get_full_name }}
+            </a>
+        </div>
+    {% empty %}
+        <p class="text-muted">No users found.</p>
+    {% endfor %}
+
+    <hr>
+
+    <h4>Posts</h4>
+    {% for post in posts %}
+        <div class="card mb-2 p-2">
+            <p>{{ post.content }}</p>
+            <small class="text-muted">by <a href="{% url 'profile' post.author.username %}">@{{ post.author.username }}</a></small>
+        </div>
+    {% empty %}
+        <p class="text-muted">No posts found.</p>
+    {% endfor %}
+</div>
+{% endblock %}

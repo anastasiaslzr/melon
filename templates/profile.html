@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="centered-container">
+    <!-- Profile Header -->
+    <div class="profile-header card mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    <!-- Large Profile Picture -->
+                    <div class="profile-pic-large-container mb-3">
+                        {% if profile.profile_picture %}
+                            <img src="{{ profile.profile_picture.url }}" 
+                                 alt="{{ profile_user.username }}'s profile" 
+                                 class="profile-pic-large">
+                        {% else %}
+                            <div class="profile-pic-large-placeholder">
+                                {{ profile_user.first_name|first|upper }}{{ profile_user.last_name|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-9">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h2 class="mb-1">
+                                {{ profile_user.get_full_name|default:profile_user.username }}
+                            </h2>
+                            <p class="text-muted mb-0">@{{ profile_user.username }}</p>
+                        </div>
+
+                        {% if user.is_authenticated %}
+                            {% if is_own_profile %}
+                                <a href="{% url 'edit-profile' %}" class="btn btn-outline-primary">
+                                    Edit Profile
+                                </a>
+                            {% else %}
+                                {% if is_following %}
+                                    <a href="{% url 'unfollow-user' profile_user.username %}" class="btn btn-outline-danger">
+                                        Unfollow
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'follow-user' profile_user.username %}" class="btn btn-primary">
+                                        Follow
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    
+                    <!-- Biography -->
+                    {% if profile.biography %}
+                        <p class="mb-3">{{ profile.biography }}</p>
+                    {% else %}
+                        {% if is_own_profile %}
+                            <p class="text-muted mb-3"><em>Add a biography to tell people about yourself!</em></p>
+                        {% endif %}
+                    {% endif %}
+                    
+                    <!-- Stats -->
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <strong>{{ posts.count }}</strong>
+                            <div class="text-muted">Posts</div>
+                        </div>
+                        <div class="col-4">
+                            <strong>{{ follower_count }}</strong>
+                            <div class="text-muted">Followers</div>
+                        </div>
+                        <div class="col-4">
+                            <strong>{{ following_count }}</strong>
+                            <div class="text-muted">Following</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posts Section -->
+    <div class="posts-section">
+        <h4 class="mb-4">
+            {% if is_own_profile %}
+                Your Posts
+            {% else %}
+                {{ profile_user.username }}'s Posts
+            {% endif %}
+        </h4>
+        
+        {% if posts %}
+            {% for post in posts %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <!-- Small Profile Picture -->
+                        <div class="profile-pic-container me-3">
+                            {% if profile.profile_picture %}
+                                <img src="{{ profile.profile_picture.url }}" 
+                                     alt="{{ post.author.username }}'s profile" 
+                                     class="profile-pic">
+                            {% else %}
+                                <div class="profile-pic-placeholder">
+                                    {{ post.author.first_name|first|upper }}{{ post.author.last_name|first|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <h6 class="mb-0">
+                                <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
+                            </h6>
+                            <small class="text-muted">{{ post.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                    
+                    <p class="card-text post-content">{{ post.content }}</p>
+
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" class="img-fluid rounded mb-3">
+                    {% endif %}
+
+                    <div class="d-flex align-items-center">
+                        {% if request.user.is_authenticated %}
+                            {% if post.user_liked %}
+                                <a href="{% url 'unlike-post' post.id %}" class="btn btn-sm btn-outline-danger me-2">
+                                    ❤️ Unlike
+                                </a>
+                            {% else %}
+                                <a href="{% url 'like-post' post.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                    🤍 Like
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        <span class="text-muted">{{ post.like_count }} likes</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5">
+                <p class="text-muted">
+                    {% if is_own_profile %}
+                        You haven't posted anything yet. <a href="{% url 'create-post' %}">Create your first post!</a>
+                    {% else %}
+                        {{ profile_user.username }} hasn't posted anything yet.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

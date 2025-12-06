@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="centered-container">
+    
+    <div class="mb-3">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">← Back</a>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            
+            <div class="d-flex align-items-center mb-3">
+                <a href="{% url 'profile' post.author.username %}" class="text-decoration-none text-dark d-flex align-items-center">
+                    <div class="profile-pic-container me-3">
+                        {% if post.author.userprofile.profile_picture %}
+                            <img src="{{ post.author.userprofile.profile_picture.url }}" 
+                                 alt="{{ post.author.username }}'s profile" 
+                                 class="profile-pic">
+                        {% else %}
+                            <div class="profile-pic-placeholder">
+                                {{ post.author.first_name|first|upper }}{{ post.author.last_name|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <h6 class="mb-0">
+                            <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
+                        </h6>
+                        <small class="text-muted">@{{ post.author.username }} • {{ post.created_at|date:"M d, Y" }}</small>
+                    </div>
+                </a>
+            </div>
+
+            <p class="card-text post-content text-break">{{ post.content }}</p>
+            
+            {% if post.image %}
+                <img src="{{ post.image.url }}" class="img-fluid rounded mb-3 w-100" alt="Post image">
+            {% endif %}
+
+            <div class="text-muted mb-3">
+                ❤️ {{ post.likes.count }} Likes
+            </div>
+
+            <hr>
+
+            <h5 class="mb-3">Comments</h5>
+            
+            <div class="comments-list mb-4">
+                {% for comment in comments %}
+                    <div class="d-flex mb-3">
+                        <div class="me-2 mt-1">
+                            <a href="{% url 'profile' comment.author.username %}" class="text-decoration-none">
+                                <strong>{{ comment.author.username }}</strong>
+                            </a>
+                        </div>
+                        <div class="flex-grow-1 bg-light p-2 rounded">
+                            <p class="mb-0 text-break">{{ comment.text }}</p>
+                            <small class="text-muted">{{ comment.created_at|timesince }} ago</small>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted text-center py-3">No comments yet. Be the first to share your thoughts!</p>
+                {% endfor %}
+            </div>
+
+            {% if user.is_authenticated %}
+                <form method="POST" class="mt-4">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.text }}
+                        {% if form.text.errors %}
+                            <div class="text-danger small mt-1">{{ form.text.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Post Comment</button>
+                </form>
+            {% else %}
+                <div class="alert alert-light text-center">
+                    <a href="{% url 'login' %}">Log in</a> to leave a comment.
+                </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
