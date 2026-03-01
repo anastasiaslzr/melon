@@ -28,7 +28,15 @@
 
             <p class="card-text post-content">{{ post.content }}</p>
             {% if post.image %}
-                <img src="{{ post.image.url }}" class="img-fluid rounded mb-3" alt="">
+                <div class="position-relative">
+                    <img src="{{ post.image.url }}" class="img-fluid rounded mb-3" alt="">
+                    <div class="position-absolute top-0 end-0 m-2 bg-white bg-opacity-75 rounded p-2">
+                        <h6 class="mb-0">
+                            <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
+                        </h6>
+                        <small class="text-muted">@{{ post.author.username }}</small>
+                    </div>
+                </div>
             {% endif %}
 
 

@@ -33,9 +33,9 @@ def home(request):
             user_liked=Value(False, output_field=BooleanField())
         )
 
-    return render(request, 'home.html', {
+    return render(request, 'index.html', {  # Changed from 'home.html' to 'index.html'
         'posts': posts_qs,
-        'comment_form': CommentForm()  # <--- PASS THE FORM HERE
+        'comment_form': CommentForm()
     })
 
 
